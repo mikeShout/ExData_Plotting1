@@ -1,0 +1,38 @@
+library(sqldf)
+
+# If data is not in working directory, then download and unzip... 
+
+if(!file.exists("household_power_consumption.txt")) {
+      download.file("http://d396qusza40orc.cloudfront.net/exdata%2Fdata%2Fhousehold_power_consumption.zip", destfile="household_power_consumption.zip")
+      unzip("household_power_consumption.zip")
+}
+
+#Import dates of interest from the file...
+power <- read.csv.sql("household_power_consumption.txt", sep=";", sql = "select * from file where Date IN ('1/2/2007','2/2/2007')") #2/1/2007
+closeAllConnections()
+
+# combine date and time variables...
+power$DT <- paste(power$Date, power$Time)
+power$DT <- strptime(power$DT, format="%d/%m/%Y %H:%M:%S")
+
+
+#initiate png file for the graph and build the line graph...
+png("plot4.png", width = 480, height =480)
+
+par(mfrow = c(2,2))
+
+plot(power$DT, power$Global_active_power, type="l", xlab="", ylab = "Global Active Power (kilowatts)")
+
+plot(power$DT, power$Voltage, type="l", xlab="datetime", ylab = "Voltage")
+
+plot(power$DT, power$Sub_metering_1, type="l", col = "black", xlab="", ylab = "Energy sub metering")
+lines(power$DT, power$Sub_metering_2, col="red")
+lines(power$DT, power$Sub_metering_3, col="blue")
+legend("topright", bty="n", lty= 1, col = c("black", "red", "blue"), legend=c("Sub_metering_1","Sub_metering_2","Sub_metering_3"))
+
+plot(power$DT, power$Global_reactive_power, type="l", xlab="datetime", ylab = "Global_reactive_power")
+
+dev.off()
+
+
+print("Graph created, enjoy")
