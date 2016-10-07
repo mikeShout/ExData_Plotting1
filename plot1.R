@@ -1,4 +1,7 @@
+# install.packages("sqldf")
 library(sqldf)
+
+setwd("C:/Users/Mike/Documents/Projects/ExData_Plotting1")
 
 # If data is not in working directory, then download and unzip... 
 
@@ -7,11 +10,13 @@ if(!file.exists("household_power_consumption.txt")) {
       unzip("household_power_consumption.zip")
 }
 
-#Import dates of interest from the file...
+#Import data from file where the dates are  2007-02-01 and 2007-02-02. This will be more efficient than importing all data and filtering later... 
+
 power <- read.csv.sql("household_power_consumption.txt", sep=";", sql = "select * from file where Date IN ('1/2/2007','2/2/2007')") #2/1/2007
 closeAllConnections()
 
 # combine date and time variables...
+
 power$DT <- paste(power$Date, power$Time)
 power$DT <- strptime(power$DT, format="%d/%m/%Y %H:%M:%S")
 
